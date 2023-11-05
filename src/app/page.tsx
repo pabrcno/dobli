@@ -1,6 +1,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import { Hello } from "./components/Hello";
+import { YouTubeUrlInput } from "./components/YouTubeUrlInput";
 
 export default function Home() {
   return (
@@ -27,14 +28,7 @@ export default function Home() {
       </div>
 
       <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+        <YouTubeUrlInput />
       </div>
 
       <div className={styles.grid}>
