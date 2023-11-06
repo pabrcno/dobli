@@ -31,7 +31,7 @@ export type VideoStatistics = {
 };
 
 // Define the TypeScript type for the video object which now uses VideoSnippet and VideoStatistics
-export type Video = {
+export type YTVideo = {
   kind: string;
   etag: string;
   id: string;
@@ -43,11 +43,67 @@ export type Video = {
 export type VideoListResponse = {
   kind: string;
   etag: string;
-  items: Video[];
+  items: YTVideo[];
   pageInfo: {
     totalResults: number;
     resultsPerPage: number;
   };
+};
+
+export type YTAuthorChannelId = {
+  value: string;
+};
+
+export type YTCommentSnippet = {
+  channelId: string;
+  videoId: string;
+  textDisplay: string;
+  textOriginal: string;
+  authorDisplayName: string;
+  authorProfileImageUrl: string;
+  authorChannelUrl: string;
+  authorChannelId: YTAuthorChannelId;
+  canRate: boolean;
+  viewerRating: string;
+  likeCount: number;
+  publishedAt: string;
+  updatedAt: string;
+};
+
+export type YTTopLevelComment = {
+  kind: string;
+  etag: string;
+  id: string;
+  snippet: YTCommentSnippet;
+};
+
+export type YTCommentThreadSnippet = {
+  channelId: string;
+  videoId: string;
+  topLevelComment: YTTopLevelComment;
+  canReply: boolean;
+  totalReplyCount: number;
+  isPublic: boolean;
+};
+
+export type YTCommentThread = {
+  kind: string;
+  etag: string;
+  id: string;
+  snippet: YTCommentThreadSnippet;
+};
+
+export type YTPageInfo = {
+  totalResults: number;
+  resultsPerPage: number;
+};
+
+export type YTCommentThreadListResponse = {
+  kind: string;
+  etag: string;
+  nextPageToken: string;
+  pageInfo: YTPageInfo;
+  items: YTCommentThread[];
 };
 
 export enum EVideoDetailType {

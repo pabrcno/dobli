@@ -11,6 +11,8 @@ import {
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { trpc } from "../_trpc/client";
+import { currentVideoLatestCommentAtom, videoAtom } from "../store";
+import { useAtom } from "jotai";
 
 // Define the schema using Zod
 const urlSchema = z.string().url();
@@ -20,10 +22,14 @@ const MotionInput = motion(Input);
 const MotionButton = motion(Button);
 
 export function YouTubeUrlInput() {
-  const videoMutation = trpc.createVideoTitle.useMutation();
+  const processVideoFromUrlMutation = trpc.processVideoFromUrl.useMutation();
   const [inputValue, setInputValue] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  const [video, setVideo] = useAtom(videoAtom);
+  const [latestComment, setLatestComment] = useAtom(
+    currentVideoLatestCommentAtom
+  );
 
   const validateInput = (value: string) => {
     try {
@@ -56,9 +62,10 @@ export function YouTubeUrlInput() {
   const onSubmit = async () => {
     // Prevent the default form submit action
     try {
-      const videoTitle = await videoMutation.mutateAsync(inputValue);
-      console.log("Success!");
-      console.log(videoTitle);
+      const { video, latestComment } =
+        await processVideoFromUrlMutation.mutateAsync(inputValue);
+      setVideo({ ...video, updatedAt: new Date(video.updatedAt) });
+      setLatestComment(latestComment);
     } catch (e) {
       if (e instanceof Error)
         toast({
@@ -77,7 +84,7 @@ export function YouTubeUrlInput() {
       display="flex"
       flexDirection="column"
       alignContent="end"
-      width="300px"
+      maxWidth={600}
     >
       <FormLabel htmlFor="youtube-url">YouTube URL</FormLabel>
       <MotionInput
@@ -89,8 +96,9 @@ export function YouTubeUrlInput() {
         isInvalid={!!error}
         whileFocus={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300 }}
-        size="lg"
+        mb={5}
       />
+
       {!error && inputValue && (
         <MotionButton
           whileHover={{ scale: 1.05 }}

@@ -2,10 +2,12 @@ import { TRPCError } from "@trpc/server";
 import { IVideoService } from "./i-video-service";
 import {
   EVideoDetailType,
-  Video,
+  YTVideo,
   VideoListResponse,
   VideoStatistics,
+  YTCommentThreadListResponse,
 } from "./youtube-video-types";
+import { Comment, Video } from "@prisma/client";
 
 export class YoutubeVideoService implements IVideoService {
   private static instance: YoutubeVideoService;
@@ -23,9 +25,9 @@ export class YoutubeVideoService implements IVideoService {
     return YoutubeVideoService.instance;
   }
 
-  async getVideo(url: string): Promise<string> {
+  async getVideo(url: string): Promise<Omit<Video, "id">> {
     const videoId = this.extractVideoID(url);
-    console.log("videoId", videoId);
+
     const apiUrl = this.generateUrl("videos", videoId, [
       EVideoDetailType.Statistics,
       EVideoDetailType.Snippet,
@@ -38,15 +40,22 @@ export class YoutubeVideoService implements IVideoService {
     if (!videoResponse.items || videoResponse.items.length === 0)
       throw new TRPCError({ code: "NOT_FOUND", message: "Video not found" });
 
-    const video: Video = videoResponse.items[0];
+    const video: YTVideo = videoResponse.items[0];
 
-    if (!video.snippet?.title)
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Video title not found",
-      });
-
-    return video.snippet?.title;
+    return {
+      url,
+      title: video.snippet?.title ?? null,
+      viewCount: parseInt(video.statistics?.viewCount ?? "0", 10),
+      lastCommentId: null,
+      updatedAt: new Date(),
+      transcript: null,
+      audioUrl: null,
+      translation: null,
+      defaultAudioLanguage: video.snippet?.defaultAudioLanguage ?? null,
+      targetLanguage: null,
+      thumbnailUrl: video.snippet?.thumbnails?.default?.url ?? null,
+      youtubeId: video.id,
+    };
   }
 
   async getVideoViewCount(videoId: string): Promise<number> {
@@ -64,21 +73,33 @@ export class YoutubeVideoService implements IVideoService {
     return parseInt(data.items[0].statistics.viewCount, 10);
   }
 
-  async getLatestComment(videoId: string): Promise<string> {
-    const url = this.generateUrl("commentThreads", videoId, [
-      EVideoDetailType.Snippet,
-    ]);
+  async getLatestComment(
+    videoId: string
+  ): Promise<Omit<Comment, "id" | "videoId">> {
+    const url = this.generateUrl(
+      "commentThreads",
+      videoId,
+      [EVideoDetailType.Snippet],
+      "videoId"
+    );
     const response = await fetch(url);
-    const data: {
-      items: {
-        snippet: { topLevelComment: { snippet: { textDisplay: string } } };
-      }[];
-    } = await response.json();
+    const data: YTCommentThreadListResponse = await response.json();
 
-    if (!data.items || data.items.length === 0)
+    if (!data.items)
       throw new TRPCError({ code: "NOT_FOUND", message: "Comments not found" });
 
-    return data.items[0].snippet.topLevelComment.snippet.textDisplay;
+    const snippet = data.items[0].snippet.topLevelComment.snippet;
+
+    // Map the data from the YouTube API response to the PrismaCommentWithoutId type
+    const comment: Omit<Comment, "id" | "videoId"> = {
+      channelId: snippet.channelId,
+      textDisplay: snippet.textDisplay,
+      textOriginal: snippet.textOriginal,
+      authorDisplayName: snippet.authorDisplayName,
+      authorProfileImageUrl: snippet.authorProfileImageUrl,
+    };
+
+    return comment;
   }
 
   getVideoAudioSnippet(
@@ -99,13 +120,14 @@ export class YoutubeVideoService implements IVideoService {
   private generateUrl(
     endpoint: string,
     videoId: string,
-    parts: EVideoDetailType[]
+    parts: EVideoDetailType[],
+    idPrefix = "id"
   ): string {
     const apiBaseUrl: string = "https://www.googleapis.com/youtube/v3";
     const partsQuery = parts
       .map((part) => `part=${encodeURIComponent(part)}`)
       .join("&");
-    return `${apiBaseUrl}/${endpoint}?${partsQuery}&id=${encodeURIComponent(
+    return `${apiBaseUrl}/${endpoint}?${partsQuery}&${idPrefix}=${encodeURIComponent(
       videoId
     )}&key=${this.apiKey}`;
   }
