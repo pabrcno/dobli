@@ -31,6 +31,8 @@ export function YouTubeUrlInput() {
     currentVideoLatestCommentAtom
   );
 
+  const extractAudioSnippetMutation = trpc.extractAudioSnippet.useMutation();
+
   const validateInput = (value: string) => {
     try {
       urlSchema.parse(value);
@@ -57,6 +59,13 @@ export function YouTubeUrlInput() {
     try {
       const { video, latestComment } =
         await processVideoFromUrlMutation.mutateAsync(inputValue);
+
+      if (!video) return;
+
+      const audioSnippet = await extractAudioSnippetMutation.mutateAsync(
+        video.url
+      );
+      console.log(audioSnippet);
       setVideo({ ...video, updatedAt: new Date(video.updatedAt) });
       setLatestComment(latestComment);
     } catch (e) {

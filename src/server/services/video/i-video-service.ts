@@ -5,8 +5,8 @@ export interface IVideoService {
   getVideoViewCount(videoId: string): Promise<number>;
   getLatestComment(videoId: string): Promise<Omit<Comment, "id" | "videoId">>;
   getVideoAudioSnippet(
-    videoId: string,
+    videoUrl: string,
     startTime: number,
     endTime: number
-  ): Promise<Blob>;
+  ): Promise<Buffer>;
 }

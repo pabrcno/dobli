@@ -8,7 +8,11 @@ import {
   YTCommentThreadListResponse,
 } from "./youtube-video-types";
 import { Comment, Video } from "@prisma/client";
+import ytdl from "ytdl-core";
+import ffmpeg from "fluent-ffmpeg";
 
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffprobePath = require("@ffprobe-installer/ffprobe").path;
 export class YoutubeVideoService implements IVideoService {
   private static instance: YoutubeVideoService;
   private readonly apiKey: string;
@@ -16,6 +20,8 @@ export class YoutubeVideoService implements IVideoService {
   // The constructor should be private to prevent direct construction calls with the `new` operator.
   private constructor(apiKey: string) {
     this.apiKey = apiKey;
+    ffmpeg.setFfmpegPath(ffmpegPath);
+    ffmpeg.setFfprobePath(ffprobePath);
   }
 
   public static getInstance(apiKey: string): YoutubeVideoService {
@@ -102,12 +108,55 @@ export class YoutubeVideoService implements IVideoService {
     return comment;
   }
 
-  getVideoAudioSnippet(
-    videoId: string,
+  async getVideoAudioSnippet(
+    videoUrl: string,
     startTime: number,
     endTime: number
-  ): Promise<Blob> {
-    throw new Error("Method not implemented.");
+  ): Promise<Buffer> {
+    // Extract the video ID from the URL
+    const videoId = this.extractVideoID(videoUrl);
+
+    // Verify that the URL is valid
+    if (!videoId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Invalid YouTube video URL",
+      });
+    }
+
+    // Verify that startTime and endTime are valid
+    if (startTime >= endTime) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "End time must be greater than start time",
+      });
+    }
+
+    // Start downloading the video
+    const videoStream = ytdl(videoUrl, { quality: "highestaudio" });
+
+    // Prepare the audio conversion
+    return new Promise((resolve, reject) => {
+      const ffmpegProcess = ffmpeg(videoStream)
+        .audioCodec("libmp3lame")
+        .audioQuality(5) // or any other quality factor you prefer
+        .seekInput(startTime)
+        .duration(endTime - startTime)
+        .format("mp3")
+        .on("error", (err: { message: string }) => {
+          reject(
+            new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Error processing video audio snippet: " + err.message,
+            })
+          );
+        })
+        .pipe();
+
+      const chunks: Buffer[] = [];
+      ffmpegProcess.on("data", (chunk) => chunks.push(chunk));
+      ffmpegProcess.on("end", () => resolve(Buffer.concat(chunks)));
+    });
   }
 
   private extractVideoID(url: string): string {

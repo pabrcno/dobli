@@ -81,7 +81,17 @@ export const appRouter = router({
     const video = await videoRepo.findLatest();
     return video;
   }),
-  // getVideoAudioSnippet: publicProcedure.query(...) // You'd implement this similar to the others, once the method is fully implemented in your service.
+  extractAudioSnippet: publicProcedure
+    .input(z.string().url())
+    .mutation(async ({ input }) => {
+      const audioSnippet = await videoServiceInstance.getVideoAudioSnippet(
+        input,
+        30,
+        45
+      );
+
+      return audioSnippet;
+    }),
 });
 
 export type AppRouter = typeof appRouter;
