@@ -30,7 +30,7 @@ export class YoutubeVideoService implements IVideoService {
       EVideoDetailType.Statistics,
       EVideoDetailType.Snippet,
     ]);
-    console.log("apiUrl", apiUrl);
+
     const videoResponse: VideoListResponse = await fetch(apiUrl).then(
       (response) => response.json()
     );
