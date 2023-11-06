@@ -1,10 +1,10 @@
 "use client";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
 import { YouTubeUrlInput } from "./components/youtube-url-input";
 import { useAtom } from "jotai";
 import { currentVideoLatestCommentAtom, videoAtom } from "./store";
 import { VideoPreview } from "./components/video-preview";
-import { CommentPreview } from "./components/comment-preview";
+
 import { trpc } from "./_trpc/client";
 
 export default function Home() {
@@ -17,6 +17,8 @@ export default function Home() {
     trpc.refreshVideoViewCount.useMutation();
 
   const refreshLatestCommentMutation = trpc.refreshLatestComment.useMutation();
+
+  const getLastVideoQuery = trpc.getLatestVideo.useQuery();
 
   const refreshVideo = async () => {
     if (!video) return;
@@ -37,27 +39,46 @@ export default function Home() {
 
   return (
     <main>
-      <Box width="100vw" height="100vh">
-        <Flex alignItems="center" justifyContent="center" height="100%">
-          <Flex flexDirection="column" align="center">
-            <YouTubeUrlInput />
-            <Box mt={4} />
-            <Box maxWidth={600}>
-              {!!video && (
-                <VideoPreview
-                  video={video}
-                  comment={latestComment}
-                  onRefresh={refreshVideo}
-                  isRefreshing={
-                    refreshLatestCommentMutation.isLoading ||
-                    refreshVideoViewCountMutation.isLoading
-                  }
-                />
-              )}
+      <Flex
+        width="100vw"
+        height="100vh"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <YouTubeUrlInput />
+        <Box mt={4} />
+        <Box maxWidth={600}>
+          {!!video && (
+            <VideoPreview
+              video={video}
+              comment={latestComment}
+              onRefresh={refreshVideo}
+              isRefreshing={
+                refreshLatestCommentMutation.isLoading ||
+                refreshVideoViewCountMutation.isLoading
+              }
+            />
+          )}
+        </Box>
+
+        <Box maxWidth={600}>
+          {!!getLastVideoQuery.isLoading && <Spinner />}
+          {!!getLastVideoQuery.data && (
+            <Box mt={8}>
+              <Heading>Latest Video:</Heading>
+              <Box mt={4} />
+              <VideoPreview
+                video={{
+                  ...getLastVideoQuery.data,
+                  updatedAt: new Date(getLastVideoQuery.data.updatedAt),
+                }}
+                comment={null}
+              />
             </Box>
-          </Flex>
-        </Flex>
-      </Box>
+          )}
+        </Box>
+      </Flex>
     </main>
   );
 }

@@ -11,9 +11,6 @@ const apiKey: string = process.env.YOUTUBE_API_KEY || "";
 const videoServiceInstance = YoutubeVideoService.getInstance(apiKey);
 
 export const appRouter = router({
-  hello: publicProcedure.query(() => {
-    return "Hello World!";
-  }),
   processVideoFromUrl: publicProcedure
     .input(z.string().url())
     .mutation(async ({ input }) => {
@@ -78,6 +75,12 @@ export const appRouter = router({
 
       return commentRecord;
     }),
+
+  getLatestVideo: publicProcedure.query(async () => {
+    const videoRepo = VideoRepository.getInstance();
+    const video = await videoRepo.findLatest();
+    return video;
+  }),
   // getVideoAudioSnippet: publicProcedure.query(...) // You'd implement this similar to the others, once the method is fully implemented in your service.
 });
 

@@ -48,9 +48,11 @@ export function VideoPreview({
                   ? `${video.viewCount.toLocaleString()} views`
                   : "View count not available"}
               </Text>
-              <Button ml={4} onClick={onRefresh}>
-                Refresh
-              </Button>
+              {!!onRefresh && (
+                <Button ml={4} onClick={onRefresh}>
+                  Refresh
+                </Button>
+              )}
             </Flex>
           )}
         </Stack>

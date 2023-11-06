@@ -43,4 +43,10 @@ export class VideoRepository
   async delete(id: number): Promise<Video> {
     return this.prisma.video.delete({ where: { id } });
   }
+
+  async findLatest(): Promise<Video | null> {
+    return this.prisma.video.findFirst({
+      orderBy: { updatedAt: "desc" },
+    });
+  }
 }
