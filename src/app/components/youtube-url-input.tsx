@@ -35,13 +35,6 @@ export function YouTubeUrlInput() {
     try {
       urlSchema.parse(value);
       setError(null);
-      toast({
-        title: "Valid URL",
-        description: "The URL you've entered looks good!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
     } catch (e) {
       if (e instanceof z.ZodError) {
         setError(e.errors[0].message);
