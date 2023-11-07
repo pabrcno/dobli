@@ -24,13 +24,14 @@ WORKDIR /app
 # Install dependencies only when needed
 FROM base AS deps
 COPY package.json  package-lock.json*  ./
-RUN npm ci
+
 # Setup the production build stage
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # If using npm comment out above and use below instead
 # RUN npm run build
+
 
 # Uncomment to disable Next.js telemetry
 # ENV NEXT_TELEMETRY_DISABLED 1
