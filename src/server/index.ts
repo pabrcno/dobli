@@ -7,6 +7,9 @@ import { CommentRepository } from "./repo/comment-repo";
 import { GCPStorageService } from "./services/storage/gcp-storage-service";
 import { AUDIO_SNIPPET_BUCKET } from "./constants";
 import { config } from "dotenv";
+import { EISOLanguages } from "./services/translation/EISOLanguages";
+import { GCPTranslationService } from "./services/translation/gcp-translation-service";
+import { OpenAIAudioProcessingService } from "./services/audio-processing/openai-audio-processing-service";
 config();
 
 // Assuming apiKey is retrieved from environment or configuration
@@ -25,6 +28,9 @@ export const appRouter = router({
         const video = await videoServiceInstance.getVideo(input);
 
         const storageService = new GCPStorageService(AUDIO_SNIPPET_BUCKET);
+        const translationService = new GCPTranslationService();
+
+        const audioProcessingService = new OpenAIAudioProcessingService();
 
         const audioSnippet = await videoServiceInstance.getVideoAudioSnippet(
           video.url,
@@ -32,21 +38,43 @@ export const appRouter = router({
           45
         );
 
-        const audioUrl = await storageService.uploadFile(
-          audioSnippet,
-          "audio-snippets/" + video.youtubeId + ".mp3"
+        const audioTranscript = await audioProcessingService.stt(audioSnippet);
+
+        const translation = await translationService.translateText(
+          audioTranscript,
+          EISOLanguages.Spanish
+        );
+
+        const translatedAudio = await audioProcessingService.tts(translation);
+
+        const translationAudioUrl = await storageService.uploadFile(
+          translatedAudio,
+          "audio-snippets/" + video.youtubeId + "-es.mp3"
         );
 
         const latestComment = await videoServiceInstance.getLatestComment(
           video.youtubeId
         );
 
-        const videoRecord = await videoRepo.create({ ...video, audioUrl });
+        const audioUrl = await storageService.uploadFile(
+          audioSnippet,
+          "audio-snippets/" + video.youtubeId + ".mp3"
+        );
+
+        const videoRecord = await videoRepo.create({
+          ...video,
+          audioUrl,
+          translation,
+          transcript: audioTranscript,
+          translationAudioUrl,
+        });
 
         const commentRecord = await commentRepository.create({
           comment: latestComment,
           videoId: videoRecord.id,
         });
+
+        console.log(videoRecord);
 
         return {
           video: videoRecord,
@@ -57,6 +85,7 @@ export const appRouter = router({
         throw e;
       }
     }),
+
   refreshVideoViewCount: publicProcedure
     .input(z.object({ youtubeId: z.string(), videoId: z.number() }))
     .mutation(async ({ input }) => {

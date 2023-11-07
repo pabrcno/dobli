@@ -39,13 +39,7 @@ export default function Home() {
 
   return (
     <main>
-      <Flex
-        width="100vw"
-        height="100vh"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-      >
+      <Flex flexDirection="column" alignItems="center" justifyContent="center">
         <YouTubeUrlInput />
         <Box mt={4} />
         <Box maxWidth={600}>

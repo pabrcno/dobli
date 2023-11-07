@@ -61,6 +61,7 @@ export class YoutubeVideoService implements IVideoService {
       targetLanguage: null,
       thumbnailUrl: video.snippet?.thumbnails?.default?.url ?? null,
       youtubeId: video.id,
+      translationAudioUrl: null,
     };
   }
 

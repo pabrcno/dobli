@@ -62,6 +62,24 @@ export function VideoPreview({
           </Flex>
         </Stack>
       </Flex>
+
+      {!!video.translation && (
+        <Box mt={2}>
+          <Flex align="center">
+            <Text fontSize="md" fontWeight="semibold">
+              Translation:
+            </Text>
+            {!!video.translationAudioUrl && (
+              <Box px={4}>
+                <audio controls src={video?.translationAudioUrl} />
+              </Box>
+            )}
+          </Flex>
+          <Text fontSize="sm" p={2}>
+            {video.translation}
+          </Text>
+        </Box>
+      )}
       {!!comment && (
         <>
           <Divider />
