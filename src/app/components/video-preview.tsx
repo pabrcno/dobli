@@ -28,7 +28,7 @@ export function VideoPreview({
   isRefreshing?: boolean;
 }) {
   return (
-    <Card p={2} minWidth="600px">
+    <Card p={2}>
       <Flex alignItems="center" mb={5}>
         <Stack flex={1} ml={4}>
           <Heading fontSize="md">{video.title || "Untitled"}</Heading>

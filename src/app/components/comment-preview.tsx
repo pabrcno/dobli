@@ -10,7 +10,7 @@ export function CommentPreview({
   isLoading?: boolean;
 }) {
   return (
-    <Box mt={4}>
+    <Box>
       <Flex align="center">
         {!isLoading ? (
           <Avatar
