@@ -31,7 +31,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # If using npm comment out above and use below instead
 # RUN npm run build
-
+RUN npm ci
 
 # Uncomment to disable Next.js telemetry
 # ENV NEXT_TELEMETRY_DISABLED 1
