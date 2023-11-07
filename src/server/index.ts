@@ -1,9 +1,13 @@
 import { z } from "zod";
 import { publicProcedure, router } from "./trpc";
 import { YoutubeVideoService } from "./services/video/youtube-video-service";
-import "dotenv/config";
+
 import { VideoRepository } from "./repo/video-repo";
 import { CommentRepository } from "./repo/comment-repo";
+import { GCPStorageService } from "./services/storage/gcp-storage-service";
+import { AUDIO_SNIPPET_BUCKET } from "./constants";
+import { config } from "dotenv";
+config();
 
 // Assuming apiKey is retrieved from environment or configuration
 const apiKey: string = process.env.YOUTUBE_API_KEY || "";
@@ -19,11 +23,25 @@ export const appRouter = router({
         const commentRepository = CommentRepository.getInstance();
 
         const video = await videoServiceInstance.getVideo(input);
+
+        const storageService = new GCPStorageService(AUDIO_SNIPPET_BUCKET);
+
+        const audioSnippet = await videoServiceInstance.getVideoAudioSnippet(
+          video.url,
+          30,
+          45
+        );
+
+        const audioUrl = await storageService.uploadFile(
+          audioSnippet,
+          "audio-snippets/" + video.youtubeId + ".mp3"
+        );
+
         const latestComment = await videoServiceInstance.getLatestComment(
           video.youtubeId
         );
 
-        const videoRecord = await videoRepo.create(video);
+        const videoRecord = await videoRepo.create({ ...video, audioUrl });
 
         const commentRecord = await commentRepository.create({
           comment: latestComment,
@@ -81,17 +99,6 @@ export const appRouter = router({
     const video = await videoRepo.findLatest();
     return video;
   }),
-  extractAudioSnippet: publicProcedure
-    .input(z.string().url())
-    .mutation(async ({ input }) => {
-      const audioSnippet = await videoServiceInstance.getVideoAudioSnippet(
-        input,
-        30,
-        45
-      );
-
-      return audioSnippet;
-    }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -7,6 +7,7 @@ import {
   FormErrorMessage,
   useToast,
   Button,
+  Spinner,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { z } from "zod";
@@ -30,8 +31,6 @@ export function YouTubeUrlInput() {
   const [latestComment, setLatestComment] = useAtom(
     currentVideoLatestCommentAtom
   );
-
-  const extractAudioSnippetMutation = trpc.extractAudioSnippet.useMutation();
 
   const validateInput = (value: string) => {
     try {
@@ -62,10 +61,6 @@ export function YouTubeUrlInput() {
 
       if (!video) return;
 
-      const audioSnippet = await extractAudioSnippetMutation.mutateAsync(
-        video.url
-      );
-      console.log(audioSnippet);
       setVideo({ ...video, updatedAt: new Date(video.updatedAt) });
       setLatestComment(latestComment);
     } catch (e) {
@@ -101,15 +96,21 @@ export function YouTubeUrlInput() {
         mb={5}
       />
 
-      {!error && inputValue && (
-        <MotionButton
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          onClick={onSubmit}
-        >
-          Submit
-        </MotionButton>
+      {processVideoFromUrlMutation.isLoading ? (
+        <Spinner />
+      ) : (
+        !error &&
+        inputValue && (
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            onClick={onSubmit}
+          >
+            Submit
+          </MotionButton>
+        )
       )}
+
       {error && <FormErrorMessage>{error}</FormErrorMessage>}
     </FormControl>
   );

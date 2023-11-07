@@ -1,5 +1,5 @@
 "use client";
-import { Box, Center, Flex, Heading, Spinner } from "@chakra-ui/react";
+import { Box, Center, Flex, Heading, Spinner, Text } from "@chakra-ui/react";
 import { YouTubeUrlInput } from "./components/youtube-url-input";
 import { useAtom } from "jotai";
 import { currentVideoLatestCommentAtom, videoAtom } from "./store";

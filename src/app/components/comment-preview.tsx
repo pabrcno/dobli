@@ -1,16 +1,26 @@
 import React from "react";
-import { Box, Text, Flex, Avatar } from "@chakra-ui/react";
+import { Box, Text, Flex, Avatar, Spinner } from "@chakra-ui/react";
 import { Comment } from "@prisma/client";
 
-export function CommentPreview({ comment }: { comment: Comment }) {
+export function CommentPreview({
+  comment,
+  isLoading,
+}: {
+  comment: Comment;
+  isLoading?: boolean;
+}) {
   return (
     <Box mt={4}>
       <Flex align="center">
-        <Avatar
-          size="sm"
-          name={comment.authorDisplayName}
-          src={comment.authorProfileImageUrl}
-        />
+        {!isLoading ? (
+          <Avatar
+            size="sm"
+            name={comment.authorDisplayName}
+            src={comment.authorProfileImageUrl}
+          />
+        ) : (
+          <Spinner />
+        )}
         <Box p={5}>
           <Text fontSize="md" fontWeight="semibold">
             Latest Comment:

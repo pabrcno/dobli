@@ -135,6 +135,12 @@ export class YoutubeVideoService implements IVideoService {
     // Start downloading the video
     const videoStream = ytdl(videoUrl, { quality: "highestaudio" });
 
+    if (!videoStream)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Error downloading video",
+      });
+
     // Prepare the audio conversion
     return new Promise((resolve, reject) => {
       const ffmpegProcess = ffmpeg(videoStream)

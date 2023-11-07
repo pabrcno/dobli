@@ -10,6 +10,7 @@ import {
   Button,
   Spinner,
   Divider,
+  Box,
 } from "@chakra-ui/react";
 import { Video, Comment } from "@prisma/client";
 
@@ -27,41 +28,45 @@ export function VideoPreview({
   isRefreshing?: boolean;
 }) {
   return (
-    <Card p={2}>
+    <Card p={2} minWidth="600px">
       <Flex alignItems="center" mb={5}>
-        {!!video.thumbnailUrl && (
-          <Image
-            borderRadius="md"
-            src={video.thumbnailUrl}
-            alt={`Thumbnail of ${video.title}`}
-            fallbackSrc="https://via.placeholder.com/120x90.png?text=No+Image"
-          />
-        )}
         <Stack flex={1} ml={4}>
           <Heading fontSize="md">{video.title || "Untitled"}</Heading>
-          {isRefreshing ? (
-            <Spinner />
-          ) : (
-            <Flex mt={2} align="center">
+
+          <Flex
+            mt={2}
+            align="center"
+            justify="space-between"
+            minWidth="100%"
+            minHeight="100px"
+          >
+            {isRefreshing ? (
+              <Spinner />
+            ) : (
               <Text color="gray.500">
                 {video.viewCount != null
                   ? `${video.viewCount.toLocaleString()} views`
                   : "View count not available"}
               </Text>
-              {!!onRefresh && (
-                <Button ml={4} onClick={onRefresh}>
-                  Refresh
-                </Button>
-              )}
-            </Flex>
-          )}
+            )}
+            {!!onRefresh && (
+              <Button mx={4} onClick={onRefresh}>
+                Refresh
+              </Button>
+            )}
+            {!!video?.audioUrl && (
+              <Box px={4}>
+                <audio controls src={video?.audioUrl} />
+              </Box>
+            )}
+          </Flex>
         </Stack>
       </Flex>
       {!!comment && (
         <>
           <Divider />
 
-          <CommentPreview comment={comment} />
+          <CommentPreview comment={comment} isLoading={isRefreshing} />
         </>
       )}
     </Card>
