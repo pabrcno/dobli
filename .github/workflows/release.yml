@@ -46,6 +46,7 @@ jobs:
           --build-arg DATABASE_URL=${{ secrets.DATABASE_URL }} \
           --build-arg GCP_SA=${{ secrets.GCP_SA }} \
           --build-arg OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+          --build-arg AUDIO_SNIPPET_BUCKET=${{ secrets.AUDIO_SNIPPET_BUCKET }} \
           -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.APP }}/${{ env.APP }}:${{ github.sha }}" \
           -f ./Dockerfile .
           docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.APP }}/${{ env.APP }}:${{ github.sha }}"
