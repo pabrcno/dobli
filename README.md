@@ -88,7 +88,6 @@ This project is not licensed and is intended for demonstration purposes only.
 
 - **Candidate**: Paulo Briceno
 - **Email**: pabrcn@gmail.com
-- **Reviewer**: Jon Doe - jon@unilingo.tv
 
 ## Acknowledgements
 
