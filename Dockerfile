@@ -1,7 +1,6 @@
 # Use an official Node runtime as a parent image
 FROM node:21-alpine
-# Rebuild the source code only when needed
-FROM base AS builder
+
 # Declare the arguments
 ARG DATABASE_URL
 ARG YOUTUBE_API_KEY
