@@ -70,7 +70,8 @@ Deployment of ffmpeg on Vercel posed challenges, leading to a shift towards usin
 - **Google Translate**: Offers reliable and accurate text translation services.
 - **FFmpeg**: Used for video to audio conversion due to its powerful multimedia handling capabilities.
 - **YouTube API**: For retrieval of video data, a natural choice given the requirements.
-- **Cloud Storage and Cloud Run**: Offers a scalable infrastructure for storing and running the application.
+- **Cloud Storage and Cloud Run**: Offers a scalable infrastructure for storing the application.
+- **Cloud Run**: Offers a scalable infrastructure for running the application.
 
 ## Usage
 
