@@ -65,16 +65,18 @@ export function VideoPreview({
           {!!video?.audioUrl && <AudioPlayer src={video?.audioUrl} />}
         </HStack>
         <HStack spacing={1} alignItems="center" justify="space-around">
-          <Icon as={FaEye} />
-          {isRefreshing ? (
-            <Spinner />
-          ) : (
-            <Text color="gray.500">
-              {video.viewCount != null
-                ? `${video.viewCount.toLocaleString()} views`
-                : "Views not available"}
-            </Text>
-          )}
+          <HStack spacing={1}>
+            <Icon as={FaEye} />
+            {isRefreshing ? (
+              <Spinner />
+            ) : (
+              <Text color="gray.500">
+                {video.viewCount != null
+                  ? `${video.viewCount.toLocaleString()} views`
+                  : "Views not available"}
+              </Text>
+            )}
+          </HStack>
           {!!onRefresh && (
             <MotionButton
               onClick={onRefresh}
