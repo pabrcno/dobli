@@ -38,15 +38,7 @@ Participants are expected to build a website with multiple checkpoints, each add
 
 Participants will submit an email containing a README.md and a live URL of the built website. Additionally, a code walkthrough via screenshare will be expected during the interview.
 
-## How We Test Your Site
-
-The site will be tested by a non-engineer, who will check the functionality of the features against multiple YouTube URLs.
-
-## Discussion Questions
-
-Post-completion, a discussion will cover the project decisions, checkpoints completed, tech stack choices, handling of API keys, storage solutions, APIs used, and other relevant questions.
-
-## Deployment Challenges
+## Challenges
 
 Deployment of ffmpeg on Vercel posed challenges, leading to a shift towards using a Cloud Run instance for the application.
 
