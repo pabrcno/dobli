@@ -74,7 +74,7 @@ export const appRouter = router({
           videoId: videoRecord.id,
         });
 
-        console.log(videoRecord);
+        videoRecord;
 
         return {
           video: videoRecord,
@@ -113,7 +113,6 @@ export const appRouter = router({
       const latestComment = await videoServiceInstance.getLatestComment(
         video.youtubeId
       );
-      console.log(latestComment);
 
       const commentRecord = await commentRepository.create({
         comment: latestComment,
