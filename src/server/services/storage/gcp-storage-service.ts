@@ -10,9 +10,12 @@ export class GCPStorageService implements IStorageService {
   private constructor(
     bucketName: string,
     projectId: string,
-    keyFilename?: string
+    credentials: string
   ) {
-    this.storage = new Storage({ projectId, keyFilename });
+    this.storage = new Storage({
+      projectId,
+      credentials: JSON.parse(credentials),
+    });
     this.bucketName = bucketName;
   }
 
@@ -20,7 +23,7 @@ export class GCPStorageService implements IStorageService {
   public static getInstance(
     bucketName: string,
     projectId: string,
-    keyFilename?: string
+    credentials: string
   ): GCPStorageService {
     if (!GCPStorageService.instance) {
       if (!projectId) {
@@ -29,7 +32,7 @@ export class GCPStorageService implements IStorageService {
       GCPStorageService.instance = new GCPStorageService(
         bucketName,
         projectId,
-        keyFilename
+        credentials
       );
     }
     return GCPStorageService.instance;

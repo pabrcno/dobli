@@ -21,7 +21,7 @@ export const appRouter = (() => {
 
   const projectId = process.env.GOOGLE_PROJECT_ID;
 
-  const keyFilename = process.env.SA_PATH;
+  const credentials = process.env.GCP_SA;
 
   const prisma = new PrismaClient();
 
@@ -31,13 +31,15 @@ export const appRouter = (() => {
 
   if (!projectId) throw new Error("Google project ID not found");
 
+  if (!credentials) throw new Error("Google service account not found");
+
   const videoController = new VideoController(
     VideoRepository.getInstance(prisma),
     CommentRepository.getInstance(prisma),
     YoutubeVideoService.getInstance(apiKey),
-    GCPStorageService.getInstance(audioSnippetBucket, projectId, keyFilename),
+    GCPStorageService.getInstance(audioSnippetBucket, projectId, credentials),
     OpenAIAudioProcessingService.getInstance(),
-    GCPTranslationService.getInstance(keyFilename)
+    GCPTranslationService.getInstance(credentials)
   );
 
   return router({

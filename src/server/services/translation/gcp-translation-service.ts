@@ -7,17 +7,17 @@ export class GCPTranslationService implements ITranslationService {
   private translateClient: TranslationServiceClient;
 
   // Make the constructor private.
-  private constructor(keyFilename?: string) {
+  private constructor(credentials: string) {
     // Instantiates a client for Google Cloud Translation service
     this.translateClient = new TranslationServiceClient({
-      keyFilename,
+      credentials: JSON.parse(credentials),
     });
   }
 
   // Static method to get the instance of the class.
-  public static getInstance(keyFilename?: string): GCPTranslationService {
+  public static getInstance(credentials: string): GCPTranslationService {
     if (!GCPTranslationService.instance) {
-      GCPTranslationService.instance = new GCPTranslationService(keyFilename);
+      GCPTranslationService.instance = new GCPTranslationService(credentials);
     }
     return GCPTranslationService.instance;
   }
