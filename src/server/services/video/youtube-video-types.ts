@@ -37,6 +37,7 @@ export type YTVideo = {
   id: string;
   snippet?: VideoSnippet;
   statistics?: VideoStatistics;
+  contentDetails?: VideoContentDetails;
 };
 
 // Define the type for the video list response
@@ -121,3 +122,13 @@ export enum EVideoDetailType {
   Suggestions = "suggestions",
   TopicDetails = "topicDetails",
 }
+
+export type VideoContentDetails = {
+  duration: string;
+  dimension: string;
+  definition: string;
+  caption: string;
+  licensedContent: boolean;
+  contentRating: {};
+  projection: string;
+};

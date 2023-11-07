@@ -37,6 +37,7 @@ export class YoutubeVideoService implements IVideoService {
     const apiUrl = this.generateUrl("videos", videoId, [
       EVideoDetailType.Statistics,
       EVideoDetailType.Snippet,
+      EVideoDetailType.ContentDetails,
     ]);
 
     const videoResponse: VideoListResponse = await fetch(apiUrl).then(
@@ -47,6 +48,15 @@ export class YoutubeVideoService implements IVideoService {
       throw new TRPCError({ code: "NOT_FOUND", message: "Video not found" });
 
     const video: YTVideo = videoResponse.items[0];
+
+    if (
+      !!video.contentDetails?.duration &&
+      this.parseDuration(video.contentDetails.duration) < 45
+    )
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Video must be at least 45 seconds long",
+      });
 
     return {
       url,
@@ -186,5 +196,18 @@ export class YoutubeVideoService implements IVideoService {
     return `${apiBaseUrl}/${endpoint}?${partsQuery}&${idPrefix}=${encodeURIComponent(
       videoId
     )}&key=${this.apiKey}`;
+  }
+
+  parseDuration(duration: string) {
+    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+    const matches = duration.match(regex);
+
+    if (!matches) throw new Error("Invalid duration");
+
+    const hours = parseInt(matches[1]) ?? 0;
+    const minutes = parseInt(matches[2]) ?? 0;
+    const seconds = parseInt(matches[3]) ?? 0;
+
+    return hours * 3600 + minutes * 60 + seconds;
   }
 }
