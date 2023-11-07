@@ -1,24 +1,23 @@
-import { Prisma, PrismaClient, Comment } from "@prisma/client";
-import { BaseRepository } from "./i-base-repo";
+import { PrismaClient, Comment } from "@prisma/client";
 
-type CommentCreateInput = {
+import { ICommentRepo } from "./i-comment-repo";
+
+export type CommentCreateInput = {
   comment: Omit<Comment, "id" | "videoId">;
   videoId: number;
 };
 
-export class CommentRepository
-  implements BaseRepository<Comment, CommentCreateInput>
-{
+export class CommentRepository implements ICommentRepo {
   private static instance: CommentRepository;
   private prisma: PrismaClient;
 
-  private constructor() {
-    this.prisma = new PrismaClient();
+  private constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
   }
 
-  static getInstance(): CommentRepository {
+  static getInstance(prisma: PrismaClient): CommentRepository {
     if (!CommentRepository.instance) {
-      CommentRepository.instance = new CommentRepository();
+      CommentRepository.instance = new CommentRepository(prisma);
     }
     return CommentRepository.instance;
   }
@@ -34,7 +33,7 @@ export class CommentRepository
           },
         },
       },
-    });
+    }) as Promise<Comment>; // Type assertion
   }
 
   // Find a single comment by ID

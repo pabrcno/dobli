@@ -1,19 +1,18 @@
 import { Prisma, PrismaClient, Video } from "@prisma/client";
-import { BaseRepository } from "./i-base-repo";
 
-export class VideoRepository
-  implements BaseRepository<Video, Prisma.VideoCreateInput>
-{
+import { IVideoRepo } from "./i-video-repo";
+
+export class VideoRepository implements IVideoRepo {
   private static instance: VideoRepository;
   private prisma: PrismaClient;
 
-  private constructor() {
-    this.prisma = new PrismaClient();
+  private constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
   }
 
-  static getInstance(): VideoRepository {
+  static getInstance(prisma: PrismaClient): VideoRepository {
     if (!VideoRepository.instance) {
-      VideoRepository.instance = new VideoRepository();
+      VideoRepository.instance = new VideoRepository(prisma);
     }
     return VideoRepository.instance;
   }

@@ -1,12 +1,27 @@
 import OpenAI from "openai";
-
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { IAudioProcessingService } from "./i-audio-processing-service";
 
 export class OpenAIAudioProcessingService implements IAudioProcessingService {
-  private openai = new OpenAI();
+  private static instance: OpenAIAudioProcessingService;
+  private openai: OpenAI;
+
+  // The constructor is now private.
+  private constructor() {
+    this.openai = new OpenAI();
+  }
+
+  // The getInstance method ensures that only one instance of the class is created.
+  public static getInstance(): OpenAIAudioProcessingService {
+    if (!OpenAIAudioProcessingService.instance) {
+      OpenAIAudioProcessingService.instance =
+        new OpenAIAudioProcessingService();
+    }
+    return OpenAIAudioProcessingService.instance;
+  }
+
   async tts(text: string): Promise<Buffer> {
     const response = await this.openai.audio.speech.create({
       input: text,
@@ -15,7 +30,6 @@ export class OpenAIAudioProcessingService implements IAudioProcessingService {
     });
 
     const arrayBuffer = await response.arrayBuffer();
-
     return Buffer.from(arrayBuffer);
   }
 

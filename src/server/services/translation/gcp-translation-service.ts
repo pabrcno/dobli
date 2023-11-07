@@ -1,12 +1,26 @@
-import { TranslationServiceClient } from "@google-cloud/translate"; // Import the Google Cloud client library
+import { TranslationServiceClient } from "@google-cloud/translate";
 import { EISOLanguages } from "./EISOLanguages";
 import { ITranslationService } from "./i-translation-service";
 
 export class GCPTranslationService implements ITranslationService {
-  // Instantiates a client for Google Cloud Translation service
-  private translateClient = new TranslationServiceClient({
-    keyFilename: "service-account.json",
-  });
+  private static instance: GCPTranslationService;
+  private translateClient: TranslationServiceClient;
+
+  // Make the constructor private.
+  private constructor(keyFilename?: string) {
+    // Instantiates a client for Google Cloud Translation service
+    this.translateClient = new TranslationServiceClient({
+      keyFilename,
+    });
+  }
+
+  // Static method to get the instance of the class.
+  public static getInstance(keyFilename?: string): GCPTranslationService {
+    if (!GCPTranslationService.instance) {
+      GCPTranslationService.instance = new GCPTranslationService(keyFilename);
+    }
+    return GCPTranslationService.instance;
+  }
 
   async translateText(
     text: string,
@@ -19,7 +33,6 @@ export class GCPTranslationService implements ITranslationService {
         parent,
         contents: [text],
         mimeType: "text/plain", // mime types: text/plain, text/html
-
         targetLanguageCode: toLanguage,
       });
 
