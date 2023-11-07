@@ -18,7 +18,7 @@ ENV DATABASE_URL=${DATABASE_URL} \
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json to the container
-COPY package.json package-lock.json ./
+COPY . .
 
 # Install dependencies
 RUN npm install
