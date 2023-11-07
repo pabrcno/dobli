@@ -2,7 +2,7 @@ import { IVideoService } from "../services/video/i-video-service";
 import { IStorageService } from "../services/storage/i-storage-service";
 import { ITranslationService } from "../services/translation/i-translation-service";
 import { IAudioProcessingService } from "../services/audio-processing/i-audio-processing-service";
-import { EISOLanguages } from "../services/translation/EISOLanguages";
+import { EISOLanguages } from "../services/translation/e-iso-languages";
 import { IVideoRepo } from "../repo/i-video-repo";
 import { ICommentRepo } from "../repo/i-comment-repo";
 

@@ -1,5 +1,5 @@
 import { TranslationServiceClient } from "@google-cloud/translate";
-import { EISOLanguages } from "./EISOLanguages";
+import { EISOLanguages } from "./e-iso-languages";
 import { ITranslationService } from "./i-translation-service";
 
 export class GCPTranslationService implements ITranslationService {
