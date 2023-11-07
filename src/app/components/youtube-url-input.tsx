@@ -8,13 +8,14 @@ import {
   useToast,
   Button,
   Spinner,
+  Icon,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { trpc } from "../_trpc/client";
 import { currentVideoLatestCommentAtom, videoAtom } from "../store";
 import { useAtom } from "jotai";
-
+import { FaYoutube } from "react-icons/fa";
 // Define the schema using Zod
 const urlSchema = z.string().url();
 
@@ -80,19 +81,27 @@ export function YouTubeUrlInput() {
       isInvalid={!!error}
       display="flex"
       flexDirection="column"
-      alignContent="end"
+      alignItems="center"
       maxWidth={600}
+      width="100%"
+      padding={4}
+      boxShadow="lg" // Add shadow to the form control for depth
+      borderRadius="md" // Round the corners for a softer look
+      bg="gray.100" // Use a light background for the input area
     >
-      <FormLabel htmlFor="youtube-url">YouTube URL</FormLabel>
+      <FormLabel htmlFor="youtube-url" display="flex" alignItems="center">
+        <Icon as={FaYoutube} marginRight={2} color="red.500" />
+        DoBli - Translate YouTube videos
+      </FormLabel>
       <MotionInput
         id="youtube-url"
         type="text"
         value={inputValue}
         onChange={handleInputChange}
-        placeholder="Enter the YouTube URL"
+        placeholder="e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         isInvalid={!!error}
-        whileFocus={{ scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 300 }}
+        whileFocus={{ scale: 1.02 }} // More subtle scale effect
+        transition={{ duration: 0.2 }}
         mb={5}
       />
 
@@ -102,8 +111,17 @@ export function YouTubeUrlInput() {
         !error &&
         inputValue && (
           <MotionButton
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
+            bgColor="crimson"
+            color="white"
+            whileHover={{ scale: 1.02 }} // More subtle hover effect
+            whileTap={{ scale: 0.98 }} // Add effect on click
+            leftIcon={
+              processVideoFromUrlMutation.isLoading ? (
+                <Spinner />
+              ) : (
+                <FaYoutube />
+              )
+            } // Add icon for visual cue
             onClick={onSubmit}
           >
             Submit

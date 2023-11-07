@@ -11,6 +11,7 @@ export function CommentPreview({
 }) {
   return (
     <Box>
+      <Text fontSize="sm">Latest Comment:</Text>
       <Flex align="center">
         {!isLoading ? (
           <Avatar
@@ -22,9 +23,6 @@ export function CommentPreview({
           <Spinner />
         )}
         <Box p={5}>
-          <Text fontSize="md" fontWeight="semibold">
-            Latest Comment:
-          </Text>
           <Text fontSize="sm">{comment.authorDisplayName}</Text>
         </Box>
       </Flex>

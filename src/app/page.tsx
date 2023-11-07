@@ -1,5 +1,13 @@
 "use client";
-import { Box, Center, Flex, Heading, Spinner, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Heading,
+  Spinner,
+  Text,
+  VStack,
+  Container,
+} from "@chakra-ui/react";
 import { YouTubeUrlInput } from "./components/youtube-url-input";
 import { useAtom } from "jotai";
 import { currentVideoLatestCommentAtom, videoAtom } from "./store";
@@ -39,29 +47,41 @@ export default function Home() {
 
   return (
     <main>
-      <Flex flexDirection="column" alignItems="center" justifyContent="center">
-        <YouTubeUrlInput />
-        <Box mt={4} />
-        <Box maxWidth={600}>
+      <Container
+        maxW="container.xl"
+        py={10}
+        bgGradient="linear(to-b, salmon, orange.100)"
+        minHeight="100vh"
+        minWidth="100vw"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <VStack spacing={8} maxW="600px" width="100%">
+          <YouTubeUrlInput />
           {!!video && (
-            <VideoPreview
-              video={video}
-              comment={latestComment}
-              onRefresh={refreshVideo}
-              isRefreshing={
-                refreshLatestCommentMutation.isLoading ||
-                refreshVideoViewCountMutation.isLoading
-              }
-            />
+            <Box w="100%" p={4} boxShadow="md" borderRadius="lg" bg="gray.100">
+              <VideoPreview
+                video={video}
+                comment={latestComment}
+                onRefresh={refreshVideo}
+                isRefreshing={
+                  refreshLatestCommentMutation.isLoading ||
+                  refreshVideoViewCountMutation.isLoading
+                }
+              />
+            </Box>
           )}
-        </Box>
-
-        <Box maxWidth={600}>
-          {!!getLastVideoQuery.isLoading && <Spinner />}
-          {!!getLastVideoQuery.data && (
-            <Box mt={8}>
-              <Heading>Latest Video:</Heading>
-              <Box mt={4} />
+          {/* Conditional rendering based on data loading or existence */}
+          {getLastVideoQuery.isLoading ? (
+            <Center w="100%" py={10}>
+              <Spinner color="blue.500" size="xl" />
+            </Center>
+          ) : getLastVideoQuery.data ? (
+            <Box w="100%" p={4} boxShadow="md" borderRadius="lg" bg="gray.100">
+              <Heading size="sm" mb={4} color="gray.600">
+                Latest Video
+              </Heading>
               <VideoPreview
                 video={{
                   ...getLastVideoQuery.data,
@@ -70,9 +90,11 @@ export default function Home() {
                 comment={null}
               />
             </Box>
+          ) : (
+            <Text>No latest video found.</Text>
           )}
-        </Box>
-      </Flex>
+        </VStack>
+      </Container>
     </main>
   );
 }

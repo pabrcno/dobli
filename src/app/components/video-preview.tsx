@@ -1,20 +1,23 @@
-"use client";
 import React from "react";
 import {
-  Image,
   Text,
-  Stack,
   Heading,
-  Flex,
-  Card,
   Button,
   Spinner,
   Divider,
   Box,
+  VStack,
+  HStack,
+  Icon,
 } from "@chakra-ui/react";
 import { Video, Comment } from "@prisma/client";
-
+import { motion } from "framer-motion";
 import { CommentPreview } from "./comment-preview";
+import { AudioPlayer } from "./audio-player";
+import { FaEye } from "react-icons/fa";
+
+const MotionBox = motion(Box); // Wrap Box with motion to enable animations
+const MotionButton = motion(Button); // Wrap Button with motion for animations
 
 export function VideoPreview({
   video,
@@ -27,66 +30,84 @@ export function VideoPreview({
   onRefresh?: () => void;
   isRefreshing?: boolean;
 }) {
+  // This object is for framer-motion to define animation
+  const buttonVariants = {
+    initial: { scale: 1 },
+    hover: { scale: 1.05 },
+    pressed: { scale: 0.95 },
+  };
+
+  // Define a simple fade-in animation
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+      },
+    },
+  };
+
   return (
-    <Card p={2}>
-      <Flex alignItems="center" mb={5}>
-        <Stack flex={1} ml={4}>
-          <Heading fontSize="md">{video.title || "Untitled"}</Heading>
-
-          <Flex
-            mt={2}
-            align="center"
-            justify="space-between"
-            minWidth="100%"
-            minHeight="100px"
-          >
-            {isRefreshing ? (
-              <Spinner />
-            ) : (
-              <Text color="gray.500">
-                {video.viewCount != null
-                  ? `${video.viewCount.toLocaleString()} views`
-                  : "View count not available"}
-              </Text>
-            )}
-            {!!onRefresh && (
-              <Button mx={4} onClick={onRefresh}>
-                Refresh
-              </Button>
-            )}
-            {!!video?.audioUrl && (
-              <Box px={4}>
-                <audio controls src={video?.audioUrl} />
-              </Box>
-            )}
-          </Flex>
-        </Stack>
-      </Flex>
-
-      {!!video.translation && (
-        <Box mt={2}>
-          <Flex align="center">
-            <Text fontSize="md" fontWeight="semibold">
-              Translation:
+    <MotionBox
+      initial="hidden"
+      animate="show"
+      variants={fadeIn}
+      p={5}
+      borderRadius="lg"
+      minWidth="100%"
+    >
+      <VStack spacing={5} align="stretch">
+        <HStack justifyContent="space-between">
+          <HStack spacing={3}>
+            <Heading fontSize="md">{video.title || "Untitled Video"}</Heading>
+          </HStack>
+          {!!video?.audioUrl && <AudioPlayer src={video?.audioUrl} />}
+        </HStack>
+        <HStack spacing={1} alignItems="center" justify="space-around">
+          <Icon as={FaEye} />
+          {isRefreshing ? (
+            <Spinner />
+          ) : (
+            <Text color="gray.500">
+              {video.viewCount != null
+                ? `${video.viewCount.toLocaleString()} views`
+                : "Views not available"}
             </Text>
-            {!!video.translationAudioUrl && (
-              <Box px={4}>
-                <audio controls src={video?.translationAudioUrl} />
-              </Box>
-            )}
-          </Flex>
-          <Text fontSize="sm" p={2}>
-            {video.translation}
-          </Text>
-        </Box>
-      )}
-      {!!comment && (
-        <>
-          <Divider />
+          )}
+          {!!onRefresh && (
+            <MotionButton
+              onClick={onRefresh}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="pressed"
+            >
+              Refresh
+            </MotionButton>
+          )}
+        </HStack>
+        {!!video.translation && (
+          <MotionBox variants={fadeIn}>
+            <HStack>
+              <Text fontSize="md" fontWeight="semibold">
+                Translation:
+              </Text>
+              {!!video.translationAudioUrl && (
+                <AudioPlayer src={video?.translationAudioUrl} />
+              )}
+            </HStack>
 
-          <CommentPreview comment={comment} isLoading={isRefreshing} />
-        </>
-      )}
-    </Card>
+            <Text fontSize="xs">{video.translation}</Text>
+          </MotionBox>
+        )}
+
+        {!!comment && (
+          <>
+            <Divider />
+            <CommentPreview comment={comment} isLoading={isRefreshing} />
+          </>
+        )}
+      </VStack>
+    </MotionBox>
   );
 }
