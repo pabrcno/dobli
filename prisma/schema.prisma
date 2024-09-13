@@ -1,0 +1,43 @@
+// schema.prisma
+
+datasource db {
+  provider = "postgresql" // Or the database of your choice, e.g., "mysql", "sqlite", "sqlserver".
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+model Video {
+  id                    Int       @id @default(autoincrement())
+  url                   String    
+  title                 String?
+  viewCount             Int?
+  lastCommentId         Int?      // This will reference the `id` of the last comment
+  updatedAt             DateTime  @updatedAt
+  transcript            String?
+  audioUrl              String?
+  translation           String?
+  defaultAudioLanguage  String?
+  targetLanguage        String?
+  thumbnailUrl          String?
+  youtubeId             String  
+  translationAudioUrl   String? 
+
+  comments              Comment[] @relation("VideoComments")
+
+  @@map("videos")
+}
+
+model Comment {
+  id                    Int      @id @default(autoincrement())
+  channelId             String
+  video                 Video    @relation("VideoComments", fields: [videoId], references: [id])
+  videoId               Int      // This matches the type of `id` in the `Video` model
+  textDisplay           String
+  textOriginal          String
+  authorDisplayName     String
+  authorProfileImageUrl String
+
+  @@map("comments")
+}
