@@ -17,12 +17,16 @@ export class VideoController {
   ) {}
 
   async processVideoFromUrl(url: string) {
+    const audioSnippetConfig = {
+      startSecond: 0,
+      endSecond: 60,
+    };
     try {
       const video = await this.videoService.getVideo(url);
       const audioSnippet = await this.videoService.getVideoAudioSnippet(
         video.url,
-        30,
-        45
+        audioSnippetConfig.startSecond,
+        audioSnippetConfig.endSecond
       );
       const audioTranscript = await this.audioProcessingService.stt(
         audioSnippet
