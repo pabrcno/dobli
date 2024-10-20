@@ -10,6 +10,9 @@
     "postinstall": "patch-package && npx prisma db push && npx prisma generate",
     "test": "jest --passWithNoTests"
   },
+  "prisma": {
+    "schema": "./prisma/schema.prisma"
+  },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.1",
@@ -38,7 +41,6 @@
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^4.11.0",
-    "ytdl": "^1.4.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

@@ -1,32 +1,28 @@
 # Use an official Node runtime as a parent image for the base stage
 FROM node:21-alpine as base
 
-# Declare the arguments
-ARG DATABASE_URL
-ARG YOUTUBE_API_KEY
-ARG GOOGLE_PROJECT_ID
-ARG GCP_SA
-ARG AUDIO_SNIPPET_BUCKET
-ARG OPENAI_API_KEY
-
-# Set the environment variables
-ENV DATABASE_URL=${DATABASE_URL} \
-    YOUTUBE_API_KEY=${YOUTUBE_API_KEY} \
-    GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID} \
-    GCP_SA=${GCP_SA} \
-    AUDIO_SNIPPET_BUCKET=${AUDIO_SNIPPET_BUCKET}\
-    OPENAI_API_KEY=${OPENAI_API_KEY}
-
-
-
+# Set the working directory
 WORKDIR /usr/src/app
 
+# Define a build argument for DATABASE_URL
+ARG DATABASE_URL
 
-COPY . .
+# Set the environment variable for the build process
+ENV DATABASE_URL=${DATABASE_URL}
 
-# Install dependencies
+# Copy the package.json and package-lock.json first to leverage Docker caching
+COPY package*.json ./
+
+# Copy the prisma folder (relative path)
+COPY prisma ./prisma
+
+COPY patches ./patches
+
+# Install dependencies (DATABASE_URL might be needed by Prisma here)
 RUN npm install
 
+# Copy the rest of the application files
+COPY . .
 
 # Build the Next.js application for production
 RUN npm run build
