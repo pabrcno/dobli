@@ -33,15 +33,15 @@ export class OpenAIAudioProcessingService implements IAudioProcessingService {
     return Buffer.from(arrayBuffer);
   }
 
-  async stt(audioBuffer: Buffer): Promise<string> {
+  async stt(audioBuffer: Uint8Array[]): Promise<string> {
     try {
       // Write the buffer to a temporary file
       const tempFilePath = path.join(os.tmpdir(), "tempaudio.mp3");
-      await fs.promises.writeFile(tempFilePath, audioBuffer);
-
+      await fs.promises.writeFile(tempFilePath, audioBuffer.toString());
+      console.log(tempFilePath, "HERE");
       // Pass the file path to the OpenAI API
       const fileStream = fs.createReadStream(tempFilePath);
-
+      await fs.promises.writeFile(tempFilePath, audioBuffer);
       const transcriptionResponse =
         await this.openai.audio.transcriptions.create({
           model: "whisper-1",

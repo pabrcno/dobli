@@ -42,7 +42,7 @@ export class VideoController {
         video.youtubeId
       );
       const audioUrl = await this.storageService.uploadFile(
-        audioSnippet,
+        Buffer.concat(audioSnippet),
         `audio-snippets/${video.youtubeId}.mp3`
       );
       const videoRecord = await this.videoRepo.create({

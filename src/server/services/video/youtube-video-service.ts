@@ -8,7 +8,7 @@ import {
   YTCommentThreadListResponse,
 } from "./youtube-video-types";
 import { Comment, Video } from "@prisma/client";
-import ytdl from "ytdl-core";
+import ytdl from "@distube/ytdl-core";
 import ffmpeg from "fluent-ffmpeg";
 
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
@@ -123,7 +123,7 @@ export class YoutubeVideoService implements IVideoService {
     videoUrl: string,
     startTime: number,
     endTime: number
-  ): Promise<Buffer> {
+  ): Promise<Uint8Array[]> {
     // Extract the video ID from the URL
     const videoId = this.extractVideoID(videoUrl);
 
@@ -170,9 +170,9 @@ export class YoutubeVideoService implements IVideoService {
         })
         .pipe();
 
-      const chunks: Buffer[] = [];
+      const chunks: Uint8Array[] = [];
       ffmpegProcess.on("data", (chunk) => chunks.push(chunk));
-      ffmpegProcess.on("end", () => resolve(Buffer.concat(chunks)));
+      ffmpegProcess.on("end", () => resolve(chunks));
     });
   }
 

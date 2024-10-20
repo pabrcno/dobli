@@ -8,5 +8,5 @@ export interface IVideoService {
     videoUrl: string,
     startTime: number,
     endTime: number
-  ): Promise<Buffer>;
+  ): Promise<Uint8Array[]>;
 }
